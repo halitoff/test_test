@@ -61,52 +61,53 @@ def draw_delete_zone():
     txt = font.render("Удалить", True, RED)
     screen.blit(txt, (x + 10, y + h//2 - 12))
 
-# --- Основной цикл ---
-selected_inv_idx = None
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            mx, my = event.pos
-            # Проверка нажатия на инвентарь
-            inv_x, inv_y = 20, HEIGHT - 80
-            cell_size = 60
-            for i in range(INVENTORY_SIZE):
-                rect = pygame.Rect(inv_x + i*cell_size, inv_y, cell_size, cell_size)
-                if rect.collidepoint(mx, my):
-                    if i < len(game.inventory.balls):
-                        selected_inv_idx = i
-                    else:
-                        selected_inv_idx = None
-                    break
-            else:
-                # Если выбран шарик в инвентаре и клик вне инвентаря — выплюнуть
-                if selected_inv_idx is not None:
-                    ball = game.try_eject_ball(selected_inv_idx, mx, my)
-                    selected_inv_idx = None
+if __name__ == "__main__":
+    # --- Основной цикл ---
+    selected_inv_idx = None
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mx, my = event.pos
+                # Проверка нажатия на инвентарь
+                inv_x, inv_y = 20, HEIGHT - 80
+                cell_size = 60
+                for i in range(INVENTORY_SIZE):
+                    rect = pygame.Rect(inv_x + i*cell_size, inv_y, cell_size, cell_size)
+                    if rect.collidepoint(mx, my):
+                        if i < len(game.inventory.balls):
+                            selected_inv_idx = i
+                        else:
+                            selected_inv_idx = None
+                        break
                 else:
-                    # Попробовать всосать шарик
-                    game.try_absorb_ball(mx, my)
+                    # Если выбран шарик в инвентаре и клик вне инвентаря — выплюнуть
+                    if selected_inv_idx is not None:
+                        ball = game.try_eject_ball(selected_inv_idx, mx, my)
+                        selected_inv_idx = None
+                    else:
+                        # Попробовать всосать шарик
+                        game.try_absorb_ball(mx, my)
 
-    # --- Логика ---
-    game.update()
+        # --- Логика ---
+        game.update()
 
-    # --- Рендер ---
-    screen.fill(WHITE)
-    # Зона удаления
-    draw_delete_zone()
-    # Шарики
-    for ball in game.balls:
-        if not ball.in_inventory:
-            draw_ball(ball)
-    # Инвентарь
-    draw_inventory(game.inventory, selected_inv_idx)
+        # --- Рендер ---
+        screen.fill(WHITE)
+        # Зона удаления
+        draw_delete_zone()
+        # Шарики
+        for ball in game.balls:
+            if not ball.in_inventory:
+                draw_ball(ball)
+        # Инвентарь
+        draw_inventory(game.inventory, selected_inv_idx)
 
-    pygame.display.flip()
-    clock.tick(FPS)
+        pygame.display.flip()
+        clock.tick(FPS)
 
-pygame.quit()
-sys.exit()
+    pygame.quit()
+    sys.exit()
 
